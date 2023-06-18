@@ -56,6 +56,9 @@ When installing the 2-port into the vehicle, here are the wiring instructions:
 Here is an example on a 2012 LEAF:
 ![alt text](https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/blob/main/Software/CANBRIDGE-2port/Install2012.jpg)
 
+## Dependencies 📖
+This code was made possible with the help of Muxsan and their excellent 3-port hardware. Also massive thanks to my Patreon Glen for introducing me to the 2-port alternative.
+
 ## Like this project? 💖
 Leave a ⭐ If you think this project is useful. Consider hopping onto my Patreon to encourage more open-source projects!
 
