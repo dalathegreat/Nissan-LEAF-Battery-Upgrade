@@ -14,16 +14,22 @@ The BatteryUpgrade software runs on both the Muxsan 3-port CAN-bridge, and on th
 
 Note, for 2-port it has to be the BLUE PCB, the other varients are not supported.
 
-## Software needed to make changes to code
-- Keil uVision5
-
 ## Software needed to flash
+### 3-port
+- Atmel Studio 7
+### 2-port
 - STM32 ST-LINK Utility https://www.st.com/en/development-tools/stsw-link004.html
 
 ## Hardware needed to flash
+### 3-port
+- Atmel AVRisp mkII
+### 2-port
 - ST Link V2 (can be purchased for around 10€ on ebay / amazon / local electronics store)
 
 ## Flashing instructions
+### 3-port
+See this video: https://youtu.be/eLcNSo2Vn6U?t=167
+### 2-port
 Flash with BridgeFlasher.exe located in software folder. The compiled .srec files are located in output folder. For ST LINK CLI, point the exe towards the "ST-LINK_CLI.exe" located in the "STM32 ST-LINK Utility" folder that appears after installing it.
 
 This is what the BridgeFlasher.exe should look like. Press Start to flash.
@@ -57,6 +63,10 @@ When installing the 2-port into the vehicle, here are the wiring instructions:
 
 Here is an example on a 2012 LEAF:
 ![alt text](https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/blob/main/Software/CANBRIDGE-2port/Install2012.jpg)
+
+## Software needed to make changes to code
+Incase you want to make changes and actually recompile the code, you will need the following IDE
+- Keil uVision5
 
 ## Dependencies 📖
 This code was made possible with the help of Muxsan and their excellent 3-port hardware. Also massive thanks to my Patreon Glen for introducing me to the 2-port alternative.
