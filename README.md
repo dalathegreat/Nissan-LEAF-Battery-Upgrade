@@ -27,7 +27,7 @@ Note, for 2-port it has to be the BLUE PCB, the other varients are not supported
 Flash with BridgeFlasher.exe located in software folder. The compiled .srec files are located in output folder. For ST LINK CLI, point the exe towards the "ST-LINK_CLI.exe" located in the "STM32 ST-LINK Utility" folder that appears after installing it.
 
 This is what the BridgeFlasher.exe should look like. Press Start to flash.
-![alt text](https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/blob/main/software/FlashingTool.jpg)
+![alt text](https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/blob/main/software/CANBRIDGE-2port/FlashingTool.jpg)
 
 Connect the ST Link V2 to the J1 ports on the PCB. It can be hard to connect dupont wires here, so I recommend getting needle pins. 
 
