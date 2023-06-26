@@ -326,7 +326,7 @@ void can_handler(uint8_t can_bus){
 					// seems like we just need to clear any faults and show permission
 					if (VCM_WakeUpSleepCommand == 3)
 					{                                                  // VCM command: wakeup
-						frame.data[3] = (frame.data[3] & 0xC0) | 0x2A; // FRLYON=1, INTERLOCK=1, POUT=normal limit
+						frame.data[3] = (frame.data[3] & 0xD7) | 0x28; // FRLYON=1, INTERLOCK=1
 					}
 
 				}
