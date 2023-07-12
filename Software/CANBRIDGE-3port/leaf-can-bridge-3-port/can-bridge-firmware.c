@@ -661,29 +661,27 @@ void can_handler(uint8_t can_bus){
 			case 0x5C0: //Send 500ms messages here
 				send_can(battery_can_bus, ZE1_5EC_message);//500ms
 				
-				if( My_Leaf == MY_LEAF_2011 )
-				{
-					swap_5c0_max.LB_HIS_TEMP = main_battery_temp;
-					swap_5c0_max.LB_HIS_TEMP_WUP = main_battery_temp;
-					swap_5c0_avg.LB_HIS_TEMP = main_battery_temp;
-					swap_5c0_avg.LB_HIS_TEMP_WUP = main_battery_temp;
-					swap_5c0_min.LB_HIS_TEMP = main_battery_temp;
-					swap_5c0_min.LB_HIS_TEMP_WUP = main_battery_temp;
+				swap_5c0_max.LB_HIS_TEMP = main_battery_temp;
+				swap_5c0_max.LB_HIS_TEMP_WUP = main_battery_temp;
+				swap_5c0_avg.LB_HIS_TEMP = main_battery_temp;
+				swap_5c0_avg.LB_HIS_TEMP_WUP = main_battery_temp;
+				swap_5c0_min.LB_HIS_TEMP = main_battery_temp;
+				swap_5c0_min.LB_HIS_TEMP_WUP = main_battery_temp;
 					
-					if(swap_5c0_idx == 0){
-						convert_5c0_to_array(&swap_5c0_max, (uint8_t *) &frame.data);
-						} 
-					else if(swap_5c0_idx == 1){
-						convert_5c0_to_array(&swap_5c0_avg, (uint8_t *) &frame.data);
-						}
-					else {
-						convert_5c0_to_array(&swap_5c0_min, (uint8_t *) &frame.data);
+				if(swap_5c0_idx == 0){
+					convert_5c0_to_array(&swap_5c0_max, (uint8_t *) &frame.data);
+					} 
+				else if(swap_5c0_idx == 1){
+					convert_5c0_to_array(&swap_5c0_avg, (uint8_t *) &frame.data);
 					}
-					
-					swap_5c0_idx = (swap_5c0_idx + 1) % 3;
-					//This takes advantage of the modulus operator % to reset the value of swap_5c0_idx to 0 once it reaches 3.
-					//It also eliminates the need for an if statement and a conditional check, which improves performance (but sacrifices readability)
+				else {
+					convert_5c0_to_array(&swap_5c0_min, (uint8_t *) &frame.data);
 				}
+					
+				swap_5c0_idx = (swap_5c0_idx + 1) % 3;
+				//This takes advantage of the modulus operator % to reset the value of swap_5c0_idx to 0 once it reaches 3.
+				//It also eliminates the need for an if statement and a conditional check, which improves performance (but sacrifices readability)
+
 				break;
 			case 0x1F2:
  
