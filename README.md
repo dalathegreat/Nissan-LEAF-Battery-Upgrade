@@ -7,24 +7,26 @@ So you are looking to upgrade the battery in your LEAF? You've come to the right
 Start by reading all the terminology and info about what a battery upgrade, direct upgrade, paring, CAN-bridges etc. is by following this link to the wiki: https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/wiki
 
 ## Getting the hardware
-The BatteryUpgrade software runs on both the Muxsan 3-port CAN-bridge, and on the 2-port Budget CAN-bridge. This guide focuses on the 2-port since it is the easiest to source at the moment. Here are some purchase links
+The BatteryUpgrade software runs on both the Muxsan 3-port CAN-bridge, and on the 2-port Budget CAN-bridge. This guide focuses on the 2-port since it is the easiest to source at the moment. Here are some purchase links for both
 
-- 2-port [AliExpress "MB CAN Filter 18 in 1](https://www.aliexpress.com/item/1005003112723581.html?)
-- 3-port https://www.tindie.com/products/muxsan/can-mitm-bridge-3-port-rev-25/
+|  Bridge version |  Purchase link |
+| :--------: | :---------: |
+| 3-port Muxsan | [Muxsan's Tindie store](https://www.tindie.com/products/muxsan/can-mitm-bridge-3-port-rev-25/)   |
+| 2-port budget | [AliExpress "MB CAN Filter 18 in 1](https://www.aliexpress.com/item/1005003112723581.html?)   |
 
 Note, for 2-port it has to be the BLUE PCB, the other varients are not supported.
 
 ## Software needed to flash
-### 3-port
-- Atmel Studio 7
-### 2-port
-- STM32 ST-LINK Utility https://www.st.com/en/development-tools/stsw-link004.html
+|  Bridge version |  Software |  Download link |
+| :--------: | :--------: | :---------: |
+| 3-port Muxsan | Atmel Studio v7.0.1931 |  [Download here](https://www.microchip.com/en-us/tools-resources/archives/avr-sam-mcus)   |
+| 2-port budget | STM32 ST-LINK Utility |  [Download here](https://www.st.com/en/development-tools/stsw-link004.html)   |
 
 ## Hardware needed to flash
-### 3-port
-- Atmel AVRisp mkII
-### 2-port
-- ST Link V2 (can be purchased for around 10€ on ebay / amazon / local electronics store)
+|  Bridge version |  Flasher |  Product Link |
+| :--------: | :--------: | :---------: |
+| 3-port Muxsan | Atmel AVRisp mkII |  [Ebay](https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2334524.m570.l1313&_nkw=Atmel+AVRisp+mkII&_sacat=0&LH_TitleDesc=0&_odkw=ST+link+v2&_osacat=0)   |
+| 2-port budget | ST Link V2 |  [Ebay](https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2334524.m570.l1313&_nkw=ST+link+v2&_sacat=0&LH_TitleDesc=0&_odkw=ST+link+v23&_osacat=0)   |
 
 ## Flashing instructions
 ### 3-port
@@ -52,14 +54,15 @@ Nothing 	- J2
 
 ## Wiring in the hardware
 When installing the 2-port into the vehicle, here are the wiring instructions:
-· Red wire #1 -> +12V constant (fuse with 3A)
-· Red wire #2 -> +12V constant (fuse with 3A, join together with other red wire)
-· Purple -> EV-CAN Low, Green wire (battery side)
-· Green -> EV-CAN High, Blue wire (battery side)
-· Yellow -> EV-CAN Low, Green wire (vehicle side)
-· Blue -> EV-CAN High, Blue wire (vehicle side)
-· Black -> Ground
-· Black -> Ground
+
+- Red wire #1 -> +12V constant (fuse with 3A)
+- Red wire #2 -> +12V constant (fuse with 3A, join together with other red wire)
+- Purple -> EV-CAN Low, Green wire (battery side)
+- Green -> EV-CAN High, Blue wire (battery side)
+- Yellow -> EV-CAN Low, Green wire (vehicle side)
+- Blue -> EV-CAN High, Blue wire (vehicle side)
+- Black -> Ground
+- Black -> Ground
 
 Here is an example on a 2012 LEAF:
 ![alt text](https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/blob/main/Software/CANBRIDGE-2port/Install2012.jpg)
@@ -67,6 +70,9 @@ Here is an example on a 2012 LEAF:
 ## Software needed to make changes to code
 Incase you want to make changes and actually recompile the code, you will need the following IDE
 - Keil uVision5
+
+## e-nv200 notes
+The 2-port CAN-bridge can also be used on the env200. It just needs to be flashed with a different software. See this repository for the .srec file: https://github.com/dalathegreat/Nissan-env200-Battery-Upgrade/blob/main/leaf-can-bridge-3-port-env200/Debug/canbridge_ENV200_v4.00_2Port.srec
 
 ## Dependencies 📖
 This code was made possible with the help of Muxsan and their excellent 3-port hardware. Also massive thanks to my Patreon Glen for introducing me to the 2-port alternative.
