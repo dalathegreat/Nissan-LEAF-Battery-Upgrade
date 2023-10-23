@@ -37,7 +37,7 @@ Flash with BridgeFlasher.exe located in software folder. The compiled .srec file
 This is what the BridgeFlasher.exe should look like. Press Start to flash.
 ![alt text](https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/blob/main/software/CANBRIDGE-2port/FlashingTool.jpg)
 
-Connect the ST Link V2 to the J1 ports on the PCB. It can be hard to connect dupont wires here, so I recommend getting needle pins. 
+Connect the ST Link V2 to the J1 ports on the PCB. It can be hard to connect dupont wires here, so I recommend getting needle pins. Pay close attention to the pin labels on the ST Link flasher, they can vary location depending on type.
 
 7 3.3V  	- J1
 
