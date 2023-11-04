@@ -188,12 +188,10 @@ void SystemClock_Config(void)
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
-__attribute__((noreturn)) void Error_Handler(void)
+void Error_Handler(void)
 {
     /* User can add his own implementation to report the HAL error return state */
     __disable_irq();
-    while (1)
-    {
-    }
+		HAL_NVIC_SystemReset ( );
 }
 
