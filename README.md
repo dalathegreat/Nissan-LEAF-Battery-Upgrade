@@ -72,7 +72,7 @@ Incase you want to make changes and actually recompile the code, you will need t
 - Keil uVision5
 
 ## e-nv200 notes
-The 2-port CAN-bridge can also be used on the env200. It just needs to be flashed with a different software. See this repository for the .srec file: https://github.com/dalathegreat/Nissan-env200-Battery-Upgrade/blob/main/leaf-can-bridge-3-port-env200/Debug/canbridge_ENV200_v4.00_2Port.srec
+The 2-port CAN-bridge can also be used on the env200. It just needs to be flashed with a different software. See this repository for the .srec file: https://github.com/dalathegreat/Nissan-env200-Battery-Upgrade/blob/main/leaf-can-bridge-3-port-env200/Debug/canbridge.srec
 
 ## Dependencies 📖
 This code was made possible with the help of Muxsan and their excellent 3-port hardware. Also massive thanks to my Patreon Glen for introducing me to the 2-port alternative.
