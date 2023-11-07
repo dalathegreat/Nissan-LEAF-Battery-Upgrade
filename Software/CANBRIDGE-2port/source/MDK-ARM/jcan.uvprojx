@@ -340,7 +340,7 @@
               <MiscControls>-Wno-padded</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F105xC,CODE_PROTECT</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -392,42 +392,42 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Application/User/Core</GroupName>
+          <GroupName>Application/User</GroupName>
           <Files>
             <File>
               <FileName>can-bridge-firmware.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Core\Src\can-bridge-firmware.c</FilePath>
+              <FilePath>..\Src\can-bridge-firmware.c</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/main.c</FilePath>
+              <FilePath>../Src/main.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/gpio.c</FilePath>
+              <FilePath>../Src/gpio.c</FilePath>
             </File>
             <File>
               <FileName>can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/can.c</FilePath>
+              <FilePath>../Src/can.c</FilePath>
             </File>
             <File>
               <FileName>iwdg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/iwdg.c</FilePath>
+              <FilePath>../Src/iwdg.c</FilePath>
             </File>
             <File>
               <FileName>stm32f1xx_it.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/stm32f1xx_it.c</FilePath>
+              <FilePath>../Src/stm32f1xx_it.c</FilePath>
             </File>
             <File>
               <FileName>stm32f1xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/stm32f1xx_hal_msp.c</FilePath>
+              <FilePath>../Src/stm32f1xx_hal_msp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -586,7 +586,7 @@
             <File>
               <FileName>system_stm32f1xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/system_stm32f1xx.c</FilePath>
+              <FilePath>../Src/system_stm32f1xx.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -929,7 +929,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F105xC,DEBUG</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -981,42 +981,42 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>Application/User/Core</GroupName>
+          <GroupName>Application/User</GroupName>
           <Files>
             <File>
               <FileName>can-bridge-firmware.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\Core\Src\can-bridge-firmware.c</FilePath>
+              <FilePath>..\Src\can-bridge-firmware.c</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/main.c</FilePath>
+              <FilePath>../Src/main.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/gpio.c</FilePath>
+              <FilePath>../Src/gpio.c</FilePath>
             </File>
             <File>
               <FileName>can.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/can.c</FilePath>
+              <FilePath>../Src/can.c</FilePath>
             </File>
             <File>
               <FileName>iwdg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/iwdg.c</FilePath>
+              <FilePath>../Src/iwdg.c</FilePath>
             </File>
             <File>
               <FileName>stm32f1xx_it.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/stm32f1xx_it.c</FilePath>
+              <FilePath>../Src/stm32f1xx_it.c</FilePath>
             </File>
             <File>
               <FileName>stm32f1xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/stm32f1xx_hal_msp.c</FilePath>
+              <FilePath>../Src/stm32f1xx_hal_msp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1175,7 +1175,7 @@
             <File>
               <FileName>system_stm32f1xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>../Core/Src/system_stm32f1xx.c</FilePath>
+              <FilePath>../Src/system_stm32f1xx.c</FilePath>
             </File>
           </Files>
         </Group>
