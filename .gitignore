@@ -2,3 +2,5 @@ Software/CANBRIDGE-2port/source/MDK-ARM/canbridge.build_log.htm
 Software/CANBRIDGE-2port/source/MDK-ARM/jcan/*
 Software/CANBRIDGE-2port/source/MDK-ARM/jcan.uvguix.*
 Software/CANBRIDGE-2port/source/output/canbridge.srec
+Software/CANBRIDGE-3port/leaf-can-bridge-3-port/Debug
+Software/CANBRIDGE-3port/leaf-can-bridge-3-port/Release
