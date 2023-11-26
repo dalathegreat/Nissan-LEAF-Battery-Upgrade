@@ -32,7 +32,9 @@ Note, for 2-port it has to be the BLUE PCB, the other varients are not supported
 ### 3-port
 See this video: https://youtu.be/eLcNSo2Vn6U?t=167
 ### 2-port
-Flash with BridgeFlasher.exe located in software folder. The compiled .srec files are ![located in the releases section](https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/releases)  . For ST LINK CLI, point the exe towards the "ST-LINK_CLI.exe" located in the "STM32 ST-LINK Utility" folder that appears after installing it.
+See this video: https://www.youtube.com/watch?v=LssrvVYLtp8
+
+Flash with BridgeFlasher.exe located in software folder. The compiled .srec files are ![located in the releases section](https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/releases)  . For ST LINK CLI, point the exe towards the "ST-LINK_CLI.exe" located in the "STM32 ST-LINK Utility" folder that appears after installing it. Incase the BridgeFlasher.exe doesn't run, make sure you have installed [vc++ 2015 x86](https://www.microsoft.com/en-us/download/details.aspx?id=48145) 
 
 This is what the BridgeFlasher.exe should look like. Press Start to flash.
 ![alt text](https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/blob/main/software/CANBRIDGE-2port/FlashingTool.jpg)
