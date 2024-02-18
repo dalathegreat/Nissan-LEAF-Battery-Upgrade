@@ -79,6 +79,9 @@ The 2-port CAN-bridge can also be used on the env200. It just needs to be flashe
 ## Dependencies 📖
 This code was made possible with the help of Muxsan and their excellent 3-port hardware. Also massive thanks to my Patreon Glen for introducing me to the 2-port alternative.
 
+## Alternative hardware/software
+There is an excellent ESP32 alternative available here: https://github.com/NismoBoy34/Esp32LeafInverterBridge
+
 ## Like this project? 💖
 Leave a ⭐ If you think this project is useful. Consider hopping onto my Patreon to encourage more open-source projects!
 
