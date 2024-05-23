@@ -239,7 +239,7 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
 						if( My_Leaf == MY_LEAF_2014 ) 
 						{
 							//Calculate the SOC% value to send to the dash (Battery sends 10-95% which needs to be rescaled to dash 0-100%)
-							dash_soc = LB_MIN_SOC + (LB_MAX_SOC - LB_MIN_SOC) * (1.0 * battery_soc_pptt - MINPERCENTAGE) / (MAXPERCENTAGE - MINPERCENTAGE); 
+							dash_soc = (int16_t)(LB_MIN_SOC + (LB_MAX_SOC - LB_MIN_SOC) * (1.0 * battery_soc_pptt - MINPERCENTAGE) / (MAXPERCENTAGE - MINPERCENTAGE)); 
 							if (dash_soc < 0)
 							{ //avoid underflow
 									dash_soc = 0;
