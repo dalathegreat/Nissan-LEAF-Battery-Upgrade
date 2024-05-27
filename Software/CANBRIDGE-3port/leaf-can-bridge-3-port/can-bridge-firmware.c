@@ -101,6 +101,8 @@ volatile	uint8_t			flip_3B8			= 0;
 
 static		can_frame_t		swap_605_message	= {.can_id = 0x605, .can_dlc = 1, .data = {0}};
 static		can_frame_t		swap_607_message	= {.can_id = 0x607, .can_dlc = 1, .data = {0}};
+static		can_frame_t		AZE0_45E_message	= {.can_id = 0x45E, .can_dlc = 1, .data = {0x00}};
+static		can_frame_t		AZE0_481_message	= {.can_id = 0x481, .can_dlc = 2, .data = {0x40,0x00}};
 
 
 void hw_init(void){
@@ -278,6 +280,24 @@ void can_handler(uint8_t can_bus){
 				//this message is only sent by 62kWh packs. We use this info to autodetect battery size
 				My_Battery = MY_BATTERY_62KWH;
 			break;
+			case 0x5B9:
+				send_can(battery_can_bus, AZE0_45E_message); // 500ms
+				send_can(battery_can_bus, AZE0_481_message); // 500ms
+				if (My_Leaf == MY_LEAF_2011)
+				{
+					frame.can_dlc = 7;
+					if(charging_state == CHARGING_SLOW)
+					{
+						frame.data[5] = 0xFF;
+					}
+					else
+					{
+						frame.data[5] = 0x4A;
+					}
+	
+					frame.data[6] = 0x80;
+				}
+			break;
 			case 0x5EB:
 				//This message is sent by 40/62kWh packs.
 				if (My_Battery == MY_BATTERY_62KWH)
@@ -353,6 +373,10 @@ void can_handler(uint8_t can_bus){
 				if(frame.can_dlc == 6)
 				{	//On ZE0 this message is 6 bytes long
 					My_Leaf = MY_LEAF_2011;
+					//We extend the message towards the battery
+					frame.can_dlc = 8;
+					frame.data[6] = 0x04;
+					frame.data[7] = 0x00;
 				}
 				else if(frame.can_dlc == 8)
 				{	//On AZE0 and ZE1, this message is 8 bytes long
@@ -366,7 +390,7 @@ void can_handler(uint8_t can_bus){
 				}
 				else
 				{
-					//message is originating from ZE0 OBC
+					//message is originating from ZE0 OBC (OR ZE1!)
 					My_Leaf = MY_LEAF_2011;
 				}
 			break;
@@ -408,6 +432,8 @@ void can_handler(uint8_t can_bus){
 				if( My_Leaf == MY_LEAF_2011 )
 				{
 					CANMASK = (frame.data[2] & 0x04) >> 2;
+					frame.can_dlc = 7; //Extend the message from 6->7 bytes
+					frame.data[6] = 0x00;
 				}
 
 				break;
