@@ -284,7 +284,7 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
 
 			if(max_charge_80_requested)
 			{
-				if((charging_state == CHARGING_SLOW) && (main_battery_soc > 80))
+				if((charging_state == CHARGING_SLOW) && (battery_soc > 80))
 				{
 					frame->data[1] = (frame->data[1] & 0xE0) | 2; //request charging stop
 					frame->data[3] = (frame->data[3] & 0xEF) | 0x10; //full charge completed
