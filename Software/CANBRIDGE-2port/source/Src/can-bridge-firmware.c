@@ -253,17 +253,15 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
                 if (VCM_WakeUpSleepCommand == 3)
                 {                                                  // VCM command: wakeup
 										frame->data[3] = (frame->data[3] & 0xD7) | 0x28; // FRLYON=1, INTERLOCK=1
-                }
-								
-								if (startup_counter_1DB >= 100 && startup_counter_1DB <= 300) // Between 1s and 2s after poweron
-								{
-									frame->data[3] = (frame->data[3] | 0x10); // Set the full charge flag to ON during startup
-								}																						// This is to avoid instrumentation cluster scaling bars incorrectly
-								
-								if(startup_counter_1DB < 1000)
-								{
-									startup_counter_1DB++;
-								}
+                }			
+				if (startup_counter_1DB >= 100 && startup_counter_1DB <= 300) // Between 1s and 3s after poweron
+				{
+					frame->data[3] = (frame->data[3] | 0x10); // Set the full charge flag to ON during startup
+				}											// This is to avoid instrumentation cluster scaling bars incorrectly
+				if(startup_counter_1DB < 1000)
+				{
+					startup_counter_1DB++;
+				}
 								
 						}
 
@@ -427,28 +425,28 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
                     swap_5bc_remaining.LB_RCHGTCON = 0;
                 }
 								
-								if(startup_counter_1DB < 600) // During the first 5s of bootup, write GIDS to the max value for the pack
-								{
-									switch (My_Battery)
-                    {
-                    case MY_BATTERY_24KWH:
-											swap_5bc_remaining.LB_CAPR = 220;
-											swap_5bc_full.LB_CAPR = 220;
-											   break;
-										case MY_BATTERY_30KWH:
-											swap_5bc_remaining.LB_CAPR = 310;
-											swap_5bc_full.LB_CAPR = 310;
-											   break;
-                    case MY_BATTERY_40KWH:
-											swap_5bc_remaining.LB_CAPR = 420;
-											swap_5bc_full.LB_CAPR = 420;
-											   break;
-										case MY_BATTERY_62KWH:
-											swap_5bc_remaining.LB_CAPR = 630;
-											swap_5bc_full.LB_CAPR = 630;
-											   break;
-									}
-								}
+				if(startup_counter_1DB < 600) // During the first 6s of bootup, write GIDS to the max value for the pack
+				{
+				switch (My_Battery)
+					{
+					case MY_BATTERY_24KWH:
+							swap_5bc_remaining.LB_CAPR = 220;
+							swap_5bc_full.LB_CAPR = 220;
+							   break;
+						case MY_BATTERY_30KWH:
+							swap_5bc_remaining.LB_CAPR = 310;
+							swap_5bc_full.LB_CAPR = 310;
+							   break;
+					case MY_BATTERY_40KWH:
+							swap_5bc_remaining.LB_CAPR = 420;
+							swap_5bc_full.LB_CAPR = 420;
+							   break;
+						case MY_BATTERY_62KWH:
+							swap_5bc_remaining.LB_CAPR = 630;
+							swap_5bc_full.LB_CAPR = 630;
+							   break;
+					}
+				}
 
                 skip_5bc--;
                 
@@ -737,7 +735,7 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
 				case 0x68C:
         case 0x603:
             reset_state(); // Reset all states, vehicle is starting up
-						startup_counter_1DB = 0;
+			startup_counter_1DB = 0;
             PushCan(battery_can_bus, CAN_TX, &swap_605_message); // Send these ZE1 messages towards battery
             PushCan(battery_can_bus, CAN_TX, &swap_607_message);
         break;
