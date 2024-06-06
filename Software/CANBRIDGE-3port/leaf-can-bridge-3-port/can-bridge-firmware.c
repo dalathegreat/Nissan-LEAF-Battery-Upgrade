@@ -47,6 +47,7 @@ uint8_t		temp_lut[13]						= {25, 28, 31, 34, 37, 50, 63, 76, 80, 82, 85, 87, 90
 
 //charging variables
 volatile	uint8_t		charging_state			= 0;
+volatile	uint8_t		max_charge_80_requested	= 0;
 volatile	uint8_t		starting_up				= 0;
 
 //other variables
@@ -372,6 +373,15 @@ void can_handler(uint8_t can_bus){
 					}
 					dash_soc = (dash_soc/10);
 					frame.data[4] = (uint8_t) dash_soc;  //If this is not written, soc% on dash will say "---"
+				}
+
+				if(max_charge_80_requested)
+				{
+					if((charging_state == CHARGING_SLOW) && (battery_soc > 80))
+					{
+						frame.data[1] = (frame.data[1] & 0xE0) | 2; //request charging stop
+						frame.data[3] = (frame.data[3] & 0xEF) | 0x10; //full charge completed
+					}
 				}
 
 				calc_crc8(&frame);
@@ -740,8 +750,10 @@ void can_handler(uint8_t can_bus){
 
 				break;
 			case 0x1F2:
- 
+ 				//Collect charging state
 				charging_state = frame.data[2];
+				//Check if VCM wants to only charge to 80%
+				max_charge_80_requested = ((frame.data[0] & 0x80) >> 7);
  
 				if( My_Leaf == MY_LEAF_2011 )
 				{

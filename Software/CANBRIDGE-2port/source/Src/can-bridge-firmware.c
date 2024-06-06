@@ -45,6 +45,7 @@ static const uint8_t temp_lut[13] = {25, 28, 31, 34, 37, 50, 63, 76, 80, 82, 85,
 
 // charging variables
 static volatile uint8_t charging_state = 0;
+static volatile uint8_t	max_charge_80_requested	= 0;
 
 // other variables
 #define LB_MIN_SOC 0
@@ -263,24 +264,32 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
 					startup_counter_1DB++;
 				}
 								
-						}
+			}
 
-						if( My_Leaf == MY_LEAF_2014 ) 
-						{
-							//Calculate the SOC% value to send to the dash (Battery sends 10-95% which needs to be rescaled to dash 0-100%)
-							dash_soc = (int16_t)(LB_MIN_SOC + (LB_MAX_SOC - LB_MIN_SOC) * (1.0 * battery_soc_pptt - MINPERCENTAGE) / (MAXPERCENTAGE - MINPERCENTAGE)); 
-							if (dash_soc < 0)
-							{ //avoid underflow
-									dash_soc = 0;
-							}
-							if (dash_soc > 1000)
-							{ //avoid overflow
-									dash_soc = 1000;
-							}
-							dash_soc = (dash_soc/10);
-							frame->data[4] = (uint8_t) dash_soc;  //If this is not written, soc% on dash will say "---"
-						}
-						
+			if( My_Leaf == MY_LEAF_2014 ) 
+			{
+				//Calculate the SOC% value to send to the dash (Battery sends 10-95% which needs to be rescaled to dash 0-100%)
+				dash_soc = (int16_t)(LB_MIN_SOC + (LB_MAX_SOC - LB_MIN_SOC) * (1.0 * battery_soc_pptt - MINPERCENTAGE) / (MAXPERCENTAGE - MINPERCENTAGE)); 
+				if (dash_soc < 0)
+				{ //avoid underflow
+						dash_soc = 0;
+				}
+				if (dash_soc > 1000)
+				{ //avoid overflow
+						dash_soc = 1000;
+				}
+				dash_soc = (dash_soc/10);
+				frame->data[4] = (uint8_t) dash_soc;  //If this is not written, soc% on dash will say "---"
+			}
+
+			if(max_charge_80_requested)
+			{
+				if((charging_state == CHARGING_SLOW) && (main_battery_soc > 80))
+				{
+					frame->data[1] = (frame->data[1] & 0xE0) | 2; //request charging stop
+					frame->data[3] = (frame->data[3] & 0xEF) | 0x10; //full charge completed
+				}
+			}
             calc_crc8(frame);
             break;
 				case 0x50A: //Message from VCM
@@ -695,8 +704,10 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
             
             break;
         case 0x1F2: //Message from VCM
-					
-						charging_state = frame->data[2];
+			//Collect charging state
+			charging_state = frame->data[2];
+			//Check if VCM wants to only charge to 80%
+			max_charge_80_requested = ((frame->data[0] & 0x80) >> 7);
             
             if( My_Leaf == MY_LEAF_2011 )
             {     
