@@ -74,7 +74,7 @@ volatile	uint8_t		seen_1da				= 0; //for 2011 battery swap
 volatile	uint8_t		seconds_without_1f2		= 0; //bugfix: 0x603/69C/etc. isn't sent upon charge start on the gen1 Leaf, so we need to trigger our reset on a simple absence of messages
 volatile	uint8_t		main_battery_temp		= 0; 
 volatile	uint8_t		battery_can_bus			= 2; //keeps track on which CAN bus the battery talks. 
-
+volatile	uint16_t	startup_counter_1DB		= 0;
 //timer variables
 volatile	uint16_t	sec_timer			= 1;	//actually the same as ms_timer but counts down from 1000
 
@@ -348,7 +348,14 @@ void can_handler(uint8_t can_bus){
 					{                                                  // VCM command: wakeup
 						frame.data[3] = (frame.data[3] & 0xD7) | 0x28; // FRLYON=1, INTERLOCK=1
 					}
-
+					if (startup_counter_1DB >= 100 && startup_counter_1DB <= 300) // Between 1s and 3s after poweron
+					{
+						frame.data[3] = (frame.data[3] | 0x10); // Set the full charge flag to ON during startup
+					}											  // This is to avoid instrumentation cluster scaling bars incorrectly					
+					if(startup_counter_1DB < 1000)
+					{
+						startup_counter_1DB++;
+					}
 				}
 
 				if( My_Leaf == MY_LEAF_2014 )
@@ -522,6 +529,29 @@ void can_handler(uint8_t can_bus){
 					swap_5bc_full.LB_CAPR = 0x3FF;
 					swap_5bc_remaining.LB_RCHGTIM = 0;
 					swap_5bc_remaining.LB_RCHGTCON = 0;
+				}
+				
+				if(startup_counter_1DB < 600) // During the first 6s of bootup, write GIDS to the max value for the pack
+				{
+					switch (My_Battery)
+					{
+						case MY_BATTERY_24KWH:
+						swap_5bc_remaining.LB_CAPR = 220;
+						swap_5bc_full.LB_CAPR = 220;
+						break;
+						case MY_BATTERY_30KWH:
+						swap_5bc_remaining.LB_CAPR = 310;
+						swap_5bc_full.LB_CAPR = 310;
+						break;
+						case MY_BATTERY_40KWH:
+						swap_5bc_remaining.LB_CAPR = 420;
+						swap_5bc_full.LB_CAPR = 420;
+						break;
+						case MY_BATTERY_62KWH:
+						swap_5bc_remaining.LB_CAPR = 630;
+						swap_5bc_full.LB_CAPR = 630;
+						break;
+					}
 				}
 			
 				skip_5bc--;
@@ -752,7 +782,7 @@ void can_handler(uint8_t can_bus){
 				case 0x68C:
 				case 0x603:
 				reset_state(); // Reset all states, vehicle is starting up
-
+				startup_counter_1DB = 0;
 				send_can(battery_can_bus, swap_605_message); // Send these ZE1 messages towards battery
 				send_can(battery_can_bus, swap_607_message);
 				break;
