@@ -255,7 +255,7 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
 										frame->data[3] = (frame->data[3] & 0xD7) | 0x28; // FRLYON=1, INTERLOCK=1
                 }
 								
-								if (startup_counter_1DB >= 100 && startup_counter_1DB <= 200) // Between 1s and 2s after poweron
+								if (startup_counter_1DB >= 100 && startup_counter_1DB <= 300) // Between 1s and 2s after poweron
 								{
 									frame->data[3] = (frame->data[3] | 0x10); // Set the full charge flag to ON during startup
 								}																						// This is to avoid instrumentation cluster scaling bars incorrectly
@@ -427,21 +427,25 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
                     swap_5bc_remaining.LB_RCHGTCON = 0;
                 }
 								
-								if(startup_counter_1DB < 500) // During the first 5s of bootup, write GIDS to the max value for the pack
+								if(startup_counter_1DB < 600) // During the first 5s of bootup, write GIDS to the max value for the pack
 								{
 									switch (My_Battery)
                     {
                     case MY_BATTERY_24KWH:
 											swap_5bc_remaining.LB_CAPR = 220;
+											swap_5bc_full.LB_CAPR = 220;
 											   break;
 										case MY_BATTERY_30KWH:
 											swap_5bc_remaining.LB_CAPR = 310;
+											swap_5bc_full.LB_CAPR = 310;
 											   break;
                     case MY_BATTERY_40KWH:
 											swap_5bc_remaining.LB_CAPR = 420;
+											swap_5bc_full.LB_CAPR = 420;
 											   break;
 										case MY_BATTERY_62KWH:
 											swap_5bc_remaining.LB_CAPR = 630;
+											swap_5bc_full.LB_CAPR = 630;
 											   break;
 									}
 								}
