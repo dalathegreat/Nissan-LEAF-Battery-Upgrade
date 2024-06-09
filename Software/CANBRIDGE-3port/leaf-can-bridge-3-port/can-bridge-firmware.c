@@ -104,7 +104,11 @@ static		can_frame_t		swap_605_message	= {.can_id = 0x605, .can_dlc = 1, .data = 
 static		can_frame_t		swap_607_message	= {.can_id = 0x607, .can_dlc = 1, .data = {0}};
 static		can_frame_t		AZE0_45E_message	= {.can_id = 0x45E, .can_dlc = 1, .data = {0x00}};
 static		can_frame_t		AZE0_481_message	= {.can_id = 0x481, .can_dlc = 2, .data = {0x40,0x00}};
-
+volatile	uint8_t			content_39X			= 0;
+static		can_frame_t		AZE0_390_message	= {.can_id = 0x390, .can_dlc = 8, .data = {0x04,0x00,0x00,0x03,0x00,0x80,0x00,0xd8}}; // Sending removes P3196
+volatile 	uint8_t			data_390_PRUN[4]	= {0xC7, 0xD8, 0xE9, 0xFA};
+static		can_frame_t		AZE0_393_message	= {.can_id = 0x393, .can_dlc = 8, .data = {0x00,0x20,0x00,0x00,0x20,0x00,0x00,0x03}}; // Sending removes P3196
+volatile 	uint8_t			data_393_PRUN[4]	= {0x03, 0x14, 0x25, 0x36};
 
 void hw_init(void){
 	uint8_t caninit;
@@ -462,10 +466,17 @@ void can_handler(uint8_t can_bus){
 				send_can(battery_can_bus, ZE1_5C5_message); // 100ms
 				send_can(battery_can_bus, ZE1_3B8_message); // 100ms
 
-				content_3B8 = (content_3B8 + 1) % 15;
-				//This takes advantage of the modulus operator % to reset the value of content_3B8 to 0 once it reaches 15.
-				//It also eliminates the need for an if statement and a conditional check, which improves performance (but sacrifices readability)
+				if( My_Leaf == MY_LEAF_2011 ) // ZE0 OBC messages wont satisfy the battery. Send 2013+ PDM messages towards it!
+				{
+					content_39X = (content_39X + 1) % 3;
+					AZE0_390_message.data[7] = data_390_PRUN[content_39X];
+					send_can(battery_can_bus, AZE0_390_message); // 100ms
 
+					AZE0_393_message.data[7] = data_393_PRUN[content_39X];
+					send_can(battery_can_bus, AZE0_393_message); // 100ms
+				}
+
+				content_3B8 = (content_3B8 + 1) % 15;
 				ZE1_3B8_message.data[2] = content_3B8; // 0 - 14 (0x00 - 0x0E)
 
 				if (flip_3B8)

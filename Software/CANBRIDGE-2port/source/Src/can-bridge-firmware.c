@@ -94,7 +94,11 @@ static CAN_FRAME swap_605_message = {.ID = 0x605, .dlc = 1, .ide = 0, .rtr = 0, 
 static CAN_FRAME swap_607_message = {.ID = 0x607, .dlc = 1, .ide = 0, .rtr = 0, .data = {0}};
 static CAN_FRAME AZE0_45E_message	= {.ID = 0x45E, .dlc = 1, .ide = 0, .rtr = 0, .data = {0x00}};
 static CAN_FRAME AZE0_481_message	= {.ID =  0x481, .dlc = 2, .ide = 0, .rtr = 0, .data = {0x40,0x00}};
-
+volatile	static uint8_t content_39X			= 0;
+static CAN_FRAME	AZE0_390_message	= {.ID = 0x390, .dlc = 8, .ide = 0, .rtr = 0, .data = {0x04,0x00,0x00,0x03,0x00,0x80,0x00,0xd8}}; // Sending removes P3196
+volatile 	static uint8_t data_390_PRUN[4]	= {0xC7, 0xD8, 0xE9, 0xFA};
+static CAN_FRAME	AZE0_393_message	= {.ID = 0x393, .dlc = 8, .ide = 0, .rtr = 0, .data = {0x00,0x20,0x00,0x00,0x20,0x00,0x00,0x03}}; // Sending removes P3196
+volatile 	static uint8_t data_393_PRUN[4]	= {0x03, 0x14, 0x25, 0x36};
 
 static uint8_t	crctable[256] = {0,133,143,10,155,30,20,145,179,54,60,185,40,173,167,34,227,102,108,233,120,253,247,114,80,213,223,90,203,78,68,193,67,198,204,73,216,93,87,210,240,117,127,250,107,238,228,97,160,37,47,170,59,190,180,49,19,150,156,25,136,13,7,130,134,3,9,140,29,152,146,23,53,176,186,63,174,43,33,164,101,224,234,111,254,123,113,244,214,83,89,220,77,200,194,71,197,64,74,207,94,219,209,84,118,243,249,124,237,104,98,231,38,163,169,44,189,56,50,183,149,16,26,159,14,139,129,4,137,12,6,131,18,151,157,24,58,191,181,48,161,36,46,171,106,239,229,96,241,116,126,251,217,92,86,211,66,199,205,72,202,79,69,192,81,212,222,91,121,252,246,115,226,103,109,232,41,172,166,35,178,55,61,184,154,31,21,144,1,132,142,11,15,138,128,5,148,17,27,158,188,57,51,182,39,162,168,45,236,105,99,230,119,242,248,125,95,218,208,85,196,65,75,206,76,201,195,70,215,82,88,221,255,122,112,245,100,225,235,110,175,42,32,165,52,177,187,62,28,153,147,22,135,2,8,141};
 
@@ -337,6 +341,16 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
             PushCan(battery_can_bus, CAN_TX, &ZE1_625_message); // 100ms
             PushCan(battery_can_bus, CAN_TX, &ZE1_5C5_message); // 100ms
             PushCan(battery_can_bus, CAN_TX, &ZE1_3B8_message); // 100ms
+				
+						if( My_Leaf == MY_LEAF_2011 ) // ZE0 OBC messages wont satisfy the battery. Send 2013+ PDM messages towards it!
+						{
+							content_39X = (content_39X + 1) % 3;
+							AZE0_390_message.data[7] = data_390_PRUN[content_39X];
+							PushCan(battery_can_bus, CAN_TX, &AZE0_390_message); // 100ms
+
+							AZE0_393_message.data[7] = data_393_PRUN[content_39X];
+							PushCan(battery_can_bus, CAN_TX, &AZE0_393_message); // 100ms
+						}
 
             content_3B8++;
             if (content_3B8 > 14)
