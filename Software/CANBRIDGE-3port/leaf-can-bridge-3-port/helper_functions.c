@@ -15,7 +15,7 @@ void calc_crc8(can_frame_t *frame){
 	(*frame).data[7] = crc;
 }
 
-void calc_sum4(can_frame_t *frame){
+void calc_sum2(can_frame_t *frame){ // Checksum. All message nibbles summed together, plus 2. End result in hex is anded with 0xF.
 	uint8_t sum = 0;
 	for(uint8_t i = 0; i < 7; i++){
 		sum += (*frame).data[i] >> 4;
@@ -25,6 +25,15 @@ void calc_sum4(can_frame_t *frame){
 	(*frame).data[7] = ((*frame).data[7] & 0xF0) + sum;
 }
 
+void calc_checksum4(can_frame_t *frame){ // Checksum. Sum of all nibbles (-4). End result in hex is anded with 0xF.
+    uint8_t sum = 0;
+    for(uint8_t i = 0; i < 7; i++){
+        sum += (*frame).data[i] >> 4;  // Add the upper nibble
+        sum += (*frame).data[i] & 0x0F;  // Add the lower nibble
+    }
+    sum = (sum - 4) & 0x0F;  // Subtract 4 and AND with 0xF to get the checksum
+    (*frame).data[7] = ((*frame).data[7] & 0xF0) + sum;  // Place the checksum in the lower nibble of data[7]
+}
 
 void convert_5bc_to_array(volatile Leaf_2011_5BC_message * src, uint8_t * dest){
 	dest[0] = (uint8_t) (src->LB_CAPR >> 2);
