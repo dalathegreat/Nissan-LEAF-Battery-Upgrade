@@ -62,7 +62,6 @@ volatile	uint16_t	battery_soc_pptt		= 0;
 
 volatile	uint8_t		swap_idx				= 0;
 volatile	uint8_t		swap_5c0_idx			= 0;
-volatile	uint8_t		startup_counter			= 0; //counts number of 10ms frames since startup
 volatile	uint8_t		VCM_WakeUpSleepCommand	= 0;
 volatile	uint8_t		Byte2_50B				= 0;
 volatile	uint8_t		ALU_question			= 0;
@@ -205,8 +204,9 @@ void hw_init(void){
 }
 
 void reset_state(){
-	startup_counter = 0; //car starting, reset startup counter for 1dc
 	charging_state = 0; //Reset charging state 
+	startup_counter_1DB = 0;
+	startup_counter_39X = 0;
 }
 
 int main(void){
@@ -415,37 +415,6 @@ void can_handler(uint8_t can_bus){
 					//message is originating from ZE0 OBC (OR ZE1!)
 					My_Leaf = MY_LEAF_2011;
 				}
-			break;
-			case 0x1DC:
-
-				if (startup_counter == 0)
-				{
-					frame.data[0] = 0xFF;
-					frame.data[1] = 0xFF;
-					frame.data[2] = 0xFF;
-					frame.data[3] = 0xFF;
-					frame.data[4] = 0x1F;
-					frame.data[5] = 0xFF;
-					frame.data[6] = 0xFC;
-				}
-				else if (startup_counter < 7)
-				{
-					frame.data[0] = 0xFF;
-					frame.data[1] = 0xFF;
-					frame.data[2] = 0xFF;
-					frame.data[3] = 0xFF;
-				}
-				else
-				{
-					//we are started up! let messages thru as they are
-				}
-
-				if (startup_counter < 255)
-				{
-					startup_counter++;
-				}
-			
-				calc_crc8(&frame);
 			break;
 			case 0x50B:
 
@@ -835,8 +804,7 @@ void can_handler(uint8_t can_bus){
 				case 0x68C:
 				case 0x603:
 				reset_state(); // Reset all states, vehicle is starting up
-				startup_counter_1DB = 0;
-				startup_counter_39X = 0;
+
 				send_can(battery_can_bus, swap_605_message); // Send these ZE1 messages towards battery
 				send_can(battery_can_bus, swap_607_message);
 				break;
