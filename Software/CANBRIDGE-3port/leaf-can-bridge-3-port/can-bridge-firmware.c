@@ -44,7 +44,9 @@ uint8_t		tx3_buffer_end		= 0;
 
 //Lookup table battery temperature,	offset -40C		0    1   2   3  4    5   6   7   8   9  10  11  12
 uint8_t		temp_lut[13]						= {25, 28, 31, 34, 37, 50, 63, 76, 80, 82, 85, 87, 90};
-
+//Lookup table for battery state of health
+uint8_t		bars_lut[16]						= {0,1,2,3,4,4,5,6,7,8,8,9,10,11,12,12};
+volatile	uint8_t		capacity_segments_aze0  = 0;
 //charging variables
 volatile	uint8_t		charging_state			= 0;
 volatile	uint8_t		max_charge_80_requested	= 0;
@@ -531,20 +533,20 @@ void can_handler(uint8_t can_bus){
 				{
 				temp2 = ((frame.data[4] & 0xFE) >> 1); //Collect SOH value
 				if(frame.data[0] != 0xFF){ //Only modify values when GIDS value is available, that means LBC has booted
-					if((frame.data[5] & 0x10) == 0x00){ //If everything is normal (no output power limit reason)
-						convert_array_to_5bc(&leaf_40kwh_5bc, (uint8_t *) &frame.data);
-						swap_5bc_remaining.LB_CAPR = leaf_40kwh_5bc.LB_CAPR;
-						swap_5bc_full.LB_CAPR = leaf_40kwh_5bc.LB_CAPR;
-						swap_5bc_remaining.LB_SOH = temp2;
-						swap_5bc_full.LB_SOH = temp2;
-						current_capacity_wh = swap_5bc_full.LB_CAPR * 80;
-						main_battery_temp = frame.data[3] / 20;					
-						main_battery_temp = temp_lut[main_battery_temp] + 1;
-						} else { //Output power limited
-
+					convert_array_to_5bc(&leaf_40kwh_5bc, (uint8_t *) &frame.data);
+					swap_5bc_remaining.LB_CAPR = leaf_40kwh_5bc.LB_CAPR;
+					swap_5bc_full.LB_CAPR = leaf_40kwh_5bc.LB_CAPR;
+					swap_5bc_remaining.LB_SOH = temp2;
+					swap_5bc_full.LB_SOH = temp2;
+					current_capacity_wh = swap_5bc_full.LB_CAPR * 80;
+					main_battery_temp = frame.data[3] / 20;
+					main_battery_temp = temp_lut[main_battery_temp] + 1;
+					if(frame.data[4] & 0x01) {
+						capacity_segments_aze0 = ((frame.data[2] & 0xF0) >> 4); 
 					}
-				
-					} else {
+						swap_5bc_full.LB_CAPSEG = bars_lut[capacity_segments_aze0];
+					} 
+				else { //We are booting up, set charge times to unavailable
 					swap_5bc_remaining.LB_CAPR = 0x3FF;
 					swap_5bc_full.LB_CAPR = 0x3FF;
 					swap_5bc_remaining.LB_RCHGTIM = 0;
@@ -552,7 +554,7 @@ void can_handler(uint8_t can_bus){
 				}
 				
 				if(startup_counter_1DB < 600) // During the first 6s of bootup, write GIDS to the max value for the pack
-				{
+				{							  // This is to allow the instrument cluster to know how to scale the SOC bars
 					switch (My_Battery)
 					{
 						case MY_BATTERY_24KWH:
