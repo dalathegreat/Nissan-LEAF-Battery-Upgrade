@@ -42,6 +42,9 @@ static const uint16_t charge_time[4][7] =  {
                                     };
 // Lookup table battery temperature,	offset -40C		0    1   2   3  4    5   6   7   8   9  10  11  12
 static const uint8_t temp_lut[13] = {25, 28, 31, 34, 37, 50, 63, 76, 80, 82, 85, 87, 90};
+//Lookup table for battery state of health
+static const uint8_t bars_lut[16]						= {0,1,2,3,4,4,5,6,7,8,8,9,10,11,12,12};
+static volatile	uint8_t	capacity_segments_aze0  = 0;
 
 // charging variables
 static volatile uint8_t charging_state = 0;
@@ -465,25 +468,20 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
             if( My_Leaf == MY_LEAF_2011 )
             {
                 temp = ((frame->data[4] & 0xFE) >> 1); // Collect SOH value
-                if (frame->data[0] != 0xFF)
+                if (frame->data[0] != 0xFF) // Only modify values when GIDS value is available, that means LBC has booted
                 {
-                    // Only modify values when GIDS value is available, that means LBC has booted
-                    if ((frame->data[5] & 0x10) == 0x00)
-                    {
-                        // If everything is normal (no output power limit reason)
-                        convert_array_to_5bc(&leaf_40kwh_5bc, (uint8_t *)&frame->data);
-                        swap_5bc_remaining.LB_CAPR = leaf_40kwh_5bc.LB_CAPR;
-                        swap_5bc_full.LB_CAPR = leaf_40kwh_5bc.LB_CAPR;
-                        swap_5bc_remaining.LB_SOH = temp;
-                        swap_5bc_full.LB_SOH = temp;
-                        main_battery_temp = frame->data[3] / 20;
-                        main_battery_temp = temp_lut[main_battery_temp] + 1;
-                    }
-                    else
-                    {
-                        // Output power limited
-                    }
-                }
+										convert_array_to_5bc(&leaf_40kwh_5bc, (uint8_t *)&frame->data);
+										swap_5bc_remaining.LB_CAPR = leaf_40kwh_5bc.LB_CAPR;
+										swap_5bc_full.LB_CAPR = leaf_40kwh_5bc.LB_CAPR;
+										swap_5bc_remaining.LB_SOH = temp;
+										swap_5bc_full.LB_SOH = temp;
+										main_battery_temp = frame->data[3] / 20;
+										main_battery_temp = temp_lut[main_battery_temp] + 1;
+										if(frame->data[4] & 0x01) {
+											capacity_segments_aze0 = ((frame->data[2] & 0xF0) >> 4); 
+										}
+										swap_5bc_full.LB_CAPSEG = bars_lut[capacity_segments_aze0];
+								} 
                 else
                 {		//We are booting up, set charge times to unavailable
                     swap_5bc_remaining.LB_CAPR = 0x3FF;
