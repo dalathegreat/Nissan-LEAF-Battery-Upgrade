@@ -55,7 +55,6 @@ static volatile uint8_t battery_soc = 0;
 static volatile int16_t dash_soc = 0;
 static volatile uint8_t swap_5c0_idx = 0;
 static volatile uint8_t VCM_WakeUpSleepCommand = 0;
-static volatile	uint8_t	Byte2_50B		= 0;
 static volatile uint8_t ALU_question = 0;
 static volatile uint8_t cmr_idx = QUICK_CHARGE;
 static volatile uint16_t GIDS 				= 0; 
@@ -70,7 +69,6 @@ static volatile uint8_t alternate_5bc = 0;        // for 2011 battery swap
 static volatile uint8_t seen_1da = 0;             // for 2011 battery swap
 static volatile uint8_t seconds_without_1f2 = 0;  // bugfix: 0x603/69C/etc. isn't sent upon charge start on the gen1 Leaf, so we need to trigger our reset on a simple absence of messages
 static volatile uint16_t startup_counter_1DB = 0;
-static volatile uint8_t	startup_counter_39X 	= 0;
 // bits															10					10					4				8				7			1				3	(2 space)		1					5						13
 static Leaf_2011_5BC_message swap_5bc_remaining = {.LB_CAPR = 0x12C, .LB_FULLCAP = 0x32, .LB_CAPSEG = 0, .LB_AVET = 50, .LB_SOH = 99, .LB_CAPSW = 0, .LB_RLIMIT = 0, .LB_CAPBALCOMP = 1, .LB_RCHGTCON = 0x09, .LB_RCHGTIM = 0};
 static Leaf_2011_5BC_message swap_5bc_full = {.LB_CAPR = 0x12C, .LB_FULLCAP = 0x32, .LB_CAPSEG = 12, .LB_AVET = 50, .LB_SOH = 99, .LB_CAPSW = 1, .LB_RLIMIT = 0, .LB_CAPBALCOMP = 1, .LB_RCHGTCON = 0x09, .LB_RCHGTIM = 0};
@@ -96,9 +94,6 @@ static CAN_FRAME swap_605_message = {.ID = 0x605, .dlc = 1, .ide = 0, .rtr = 0, 
 static CAN_FRAME swap_607_message = {.ID = 0x607, .dlc = 1, .ide = 0, .rtr = 0, .data = {0}};
 static CAN_FRAME AZE0_45E_message	= {.ID = 0x45E, .dlc = 1, .ide = 0, .rtr = 0, .data = {0x00}};
 static CAN_FRAME AZE0_481_message	= {.ID =  0x481, .dlc = 2, .ide = 0, .rtr = 0, .data = {0x40,0x00}};
-volatile	static uint8_t PRUN_39X			= 0;
-static CAN_FRAME	AZE0_390_message	= {.ID = 0x390, .dlc = 8, .ide = 0, .rtr = 0, .data = {0x04,0x00,0x00,0x00,0x00,0x80,0x3c,0x07}}; // Sending removes P3196
-static CAN_FRAME	AZE0_393_message	= {.ID = 0x393, .dlc = 8, .ide = 0, .rtr = 0, .data = {0x00,0x10,0x00,0x00,0x20,0x00,0x00,0x02}}; // Sending removes P3196
 
 
 static uint8_t	crctable[256] = {0,133,143,10,155,30,20,145,179,54,60,185,40,173,167,34,227,102,108,233,120,253,247,114,80,213,223,90,203,78,68,193,67,198,204,73,216,93,87,210,240,117,127,250,107,238,228,97,160,37,47,170,59,190,180,49,19,150,156,25,136,13,7,130,134,3,9,140,29,152,146,23,53,176,186,63,174,43,33,164,101,224,234,111,254,123,113,244,214,83,89,220,77,200,194,71,197,64,74,207,94,219,209,84,118,243,249,124,237,104,98,231,38,163,169,44,189,56,50,183,149,16,26,159,14,139,129,4,137,12,6,131,18,151,157,24,58,191,181,48,161,36,46,171,106,239,229,96,241,116,126,251,217,92,86,211,66,199,205,72,202,79,69,192,81,212,222,91,121,252,246,115,226,103,109,232,41,172,166,35,178,55,61,184,154,31,21,144,1,132,142,11,15,138,128,5,148,17,27,158,188,57,51,182,39,162,168,45,236,105,99,230,119,242,248,125,95,218,208,85,196,65,75,206,76,201,195,70,215,82,88,221,255,122,112,245,100,225,235,110,175,42,32,165,52,177,187,62,28,153,147,22,135,2,8,141};
@@ -108,8 +103,7 @@ void calc_crc8(CAN_FRAME *frame);
 void reset_state(void);
 void convert_5bc_to_array(Leaf_2011_5BC_message * src, uint8_t * dest);
 void convert_5c0_to_array(Leaf_2011_5C0_message * src, uint8_t * dest);
-void calc_sum2(CAN_FRAME *frame);
-void calc_checksum4(CAN_FRAME *frame);
+void calc_sum4(CAN_FRAME *frame);
 
 void convert_array_to_5bc(Leaf_2011_5BC_message * dest, uint8_t * src)
 {
@@ -133,8 +127,6 @@ void calc_crc8(CAN_FRAME *frame)
 void reset_state(void)
 {
 	charging_state = 0; //Reset charging state 
-	startup_counter_1DB = 0;
-	startup_counter_39X = 0;
 }
 
 void convert_5bc_to_array(Leaf_2011_5BC_message * src, uint8_t * dest)
@@ -162,7 +154,7 @@ void convert_5c0_to_array(Leaf_2011_5C0_message * src, uint8_t * dest)
 }
 
 
-void calc_sum2(CAN_FRAME *frame)
+void calc_sum4(CAN_FRAME *frame)
 {
 	uint8_t sum = 0;
     
@@ -174,16 +166,6 @@ void calc_sum2(CAN_FRAME *frame)
     
 	sum = (sum + 2) & 0xF;
 	frame->data[7] = (frame->data[7] & 0xF0) + sum;
-}
-
-void calc_checksum4(CAN_FRAME *frame){ // Checksum. Sum of all nibbles (-4). End result in hex is anded with 0xF.
-    uint8_t sum = 0;
-    for(uint8_t m = 0; m < 7; m++){
-        sum += frame->data[m] >> 4;  // Add the upper nibble
-        sum += frame->data[m] & 0x0F;  // Add the lower nibble
-    }
-    sum = (sum - 4) & 0x0F;  // Subtract 4 and AND with 0xF to get the checksum
-    frame->data[7] = (frame->data[7] & 0xF0) + sum;  // Place the checksum in the lower nibble of data[7]
 }
 
 
@@ -338,8 +320,7 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
         case 0x50B:
 
             VCM_WakeUpSleepCommand = (frame->data[3] & 0xC0) >> 6;
-						Byte2_50B = frame->data[2];
-
+        
             if( My_Leaf == MY_LEAF_2011 )
             {
                 CANMASK = (frame->data[2] & 0x04) >> 2;
@@ -356,45 +337,6 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
             PushCan(battery_can_bus, CAN_TX, &ZE1_625_message); // 100ms
             PushCan(battery_can_bus, CAN_TX, &ZE1_5C5_message); // 100ms
             PushCan(battery_can_bus, CAN_TX, &ZE1_3B8_message); // 100ms
-				
-						if( My_Leaf == MY_LEAF_2011 ) // ZE0 OBC messages wont satisfy the battery. Send 2013+ PDM messages towards it!
-						{
-
-							if(startup_counter_39X < 250){
-								startup_counter_39X++;
-							}
-							AZE0_390_message.data[0] = 0x04;
-							AZE0_390_message.data[3] = 0x00;
-							AZE0_390_message.data[5] = 0x80;
-							AZE0_390_message.data[6] = 0x3C;
-							AZE0_393_message.data[1] = 0x10;
-
-							if(startup_counter_39X > 13){
-								AZE0_390_message.data[3] = 0x02;
-								AZE0_390_message.data[6] = 0x00;
-								AZE0_393_message.data[1] = 0x20;
-							}
-							if(startup_counter_39X > 15){
-								AZE0_390_message.data[3] = 0x03;
-								AZE0_390_message.data[6] = 0x00;
-							}
-							if((startup_counter_39X > 20) && (Byte2_50B == 0)){ //Shutdown
-								AZE0_390_message.data[0] = 0x08;
-								AZE0_390_message.data[3] = 0x01;
-								AZE0_390_message.data[5] = 0x90;
-								AZE0_390_message.data[6] = 0x00;
-								AZE0_393_message.data[1] = 0x70;
-							}
-
-							PRUN_39X = (PRUN_39X + 1) % 3;
-							AZE0_390_message.data[7] = (uint8_t)(PRUN_39X << 4);
-							AZE0_393_message.data[7] = (uint8_t)(PRUN_39X << 4);
-							calc_checksum4(&AZE0_390_message);
-							calc_checksum4(&AZE0_393_message);
-							
-							PushCan(battery_can_bus, CAN_TX, &AZE0_390_message); // 100ms
-							PushCan(battery_can_bus, CAN_TX, &AZE0_393_message); // 100ms
-						}
 
             content_3B8++;
             if (content_3B8 > 14)
@@ -781,7 +723,7 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
                 {
                     // Only for 40/62kWh packs retrofitted to ZE0
                     frame->data[3] = 0xA0;                    // Change from gen1->gen4+ . But doesn't seem to help much. We fix it anyways.
-                    calc_sum2(frame);
+                    calc_sum4(frame);
                 }
                 
             }
@@ -804,6 +746,7 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
 				case 0x68C:
         case 0x603:
             reset_state(); // Reset all states, vehicle is starting up
+			startup_counter_1DB = 0;
             PushCan(battery_can_bus, CAN_TX, &swap_605_message); // Send these ZE1 messages towards battery
             PushCan(battery_can_bus, CAN_TX, &swap_607_message);
         break;
