@@ -26,7 +26,7 @@ Note, for 2-port it has to be the BLUE PCB, the other varients are not supported
 |  Bridge version |  Flasher |  Product Link |
 | :--------: | :--------: | :---------: |
 | 3-port Muxsan | Atmel AVRisp mkII |  [Ebay](https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2334524.m570.l1313&_nkw=Atmel+AVRisp+mkII&_sacat=0&LH_TitleDesc=0&_odkw=ST+link+v2&_osacat=0)   |
-| 2-port budget | ST Link V2 |  [Ebay](https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2334524.m570.l1313&_nkw=ST+link+v2&_sacat=0&LH_TitleDesc=0&_odkw=ST+link+v23&_osacat=0)   |
+| 2-port budget (blue) | ST Link V2 |  [Ebay](https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2334524.m570.l1313&_nkw=ST+link+v2&_sacat=0&LH_TitleDesc=0&_odkw=ST+link+v23&_osacat=0)   |
 
 ## Flashing instructions
 ### 3-port
