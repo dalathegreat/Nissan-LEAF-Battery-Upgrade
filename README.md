@@ -4,6 +4,10 @@
 So you are looking to upgrade the battery in your LEAF? You've come to the right place for information and software/hardware required. Take some time to familiarize with the content.
 
 ## Read this first 
+
+> [!IMPORTANT]
+> The info here applies to OEM Nissan battery packs. The software/guides do NOT support changing cells inside the battery pack (commonly known as Chinese CATL upgrade / bruteforce cellswap). If you have the latter, look elsewhere, the info here is not for you.
+
 Start by reading all the terminology and info about what a battery upgrade, direct upgrade, paring, CAN-bridges etc. is by following this link to the wiki: https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/wiki
 
 ## Getting the hardware
