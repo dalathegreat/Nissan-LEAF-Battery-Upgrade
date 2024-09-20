@@ -73,6 +73,21 @@ When installing the 2-port into the vehicle, here are the wiring instructions. N
 Here is an example on a 2012 LEAF:
 ![alt text](https://github.com/dalathegreat/Nissan-LEAF-Battery-Upgrade/blob/main/Software/CANBRIDGE-2port/Install2012.jpg)
 
+## Troubleshooting
+
+### Problems flashing?
+If you are having problems flashing the bridge, for instance getting messages "Unable to open file!", or not being able to open the programmer app, make sure:
+- Only JTAG cables are connected to the bridge
+- Incase the BridgeFlasher.exe doesn't run, make sure you have installed [vc++ 2015 x86](https://www.microsoft.com/en-us/download/details.aspx?id=48145) 
+- Try another laptop if you are having issues
+
+### No battery info after install, showing --- on instrumentation cluster
+This means no CAN data is getting thru the bridge. Make sure:
+- The bridge is flashed successfully with "Programming Complete!"
+- The wires are connected right for CAN H/L
+- Check that the bridge has constant +12V. It needs to stay on all the time
+- If the vehicle tilts hard, remove 12V battery for a few minutes before retrying
+
 ## Software needed to make changes to code
 Incase you want to make changes and actually recompile the code, you will need the following IDE
 - Keil uVision5
