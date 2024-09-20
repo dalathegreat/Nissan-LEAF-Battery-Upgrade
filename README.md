@@ -59,14 +59,14 @@ Nothing 	- J2
 
 
 ## Wiring in the hardware
-When installing the 2-port into the vehicle, here are the wiring instructions:
+When installing the 2-port into the vehicle, here are the wiring instructions. Note the colors of the wires coming from the CAN bridge can vary depending on production date. It is best to go via labels from the backside of the bridge instead.
 
 - Red wire #1 -> +12V constant (fuse with 3A)
 - Red wire #2 -> +12V constant (fuse with 3A, join together with other red wire)
-- Purple -> EV-CAN Low, Green wire (battery side)
-- Green -> EV-CAN High, Blue wire (battery side)
-- Yellow -> EV-CAN Low, Green wire (vehicle side)
-- Blue -> EV-CAN High, Blue wire (vehicle side)
+- CAN-1L (Purple?) -> EV-CAN Low, Green wire (battery side)
+- CAN-1H (Green?) -> EV-CAN High, Blue wire (battery side)
+- CAN-2L (Yellow?) -> EV-CAN Low, Green wire (vehicle side)
+- CAN-2H (Blue?) -> EV-CAN High, Blue wire (vehicle side)
 - Black -> Ground
 - Black -> Ground
 
