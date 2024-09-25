@@ -816,6 +816,12 @@ void can_handler(uint8_t can_bus){
 		//block unwanted messages
 			uint8_t blocked = 0;
 			switch(frame.can_id){
+				case 0x1C2:
+				if( My_Leaf == MY_LEAF_2011 )
+				{
+					blocked = 1;
+				}
+				break;
 				case 0x633:	//new 40kWh message, block to save CPU
 					blocked = 1;
 					break;
