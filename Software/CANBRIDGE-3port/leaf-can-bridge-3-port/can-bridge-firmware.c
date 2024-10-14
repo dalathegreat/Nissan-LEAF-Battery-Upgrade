@@ -48,7 +48,6 @@ uint8_t		temp_lut[13]						= {25, 28, 31, 34, 37, 50, 63, 76, 80, 82, 85, 87, 90
 //charging variables
 volatile	uint8_t		charging_state			= 0;
 volatile	uint8_t		max_charge_80_requested	= 0;
-volatile	uint8_t		starting_up				= 0;
 
 //other variables
 #define LB_MIN_SOC 0
@@ -337,15 +336,6 @@ void can_handler(uint8_t can_bus){
 			break;
 			case 0x1DB:
 				battery_can_bus = can_bus; // Guarantees that messages go to right bus. Without this there is a risk that the messages get sent to VCM instead of HVBAT
-
-				if (frame.data[2] == 0xFF)
-				{
-					starting_up |= 1;
-				}
-				else
-				{
-					starting_up &= ~1;
-				}
 			
 				if( My_Leaf == MY_LEAF_2011 )
 				{
@@ -521,12 +511,16 @@ void can_handler(uint8_t can_bus){
 
 			break;
 			case 0x5BC:
-				if(frame.data[0] != 0xFF){
-					starting_up &= ~4;
-					} else {
-					starting_up |= 4;
+				//Battery type detection
+				if ((frame.data[5] & 0x10) == 16){ //MaxGids active
+					if (frame.data[0] != 0xFF){ //LBC has booted up
+						MaxGIDS = (uint16_t) ((frame.data[0] << 2) | ((frame.data[1] & 0xC0) >> 6));
+						if(MaxGIDS < 363){
+							My_Battery = MY_BATTERY_30KWH;
+						}
+					}
 				}
-				
+				//Battery upgrade code
 				if( My_Leaf == MY_LEAF_2011 )
 				{
 				temp2 = ((frame.data[4] & 0xFE) >> 1); //Collect SOH value
