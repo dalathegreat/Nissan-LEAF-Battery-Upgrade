@@ -16,7 +16,7 @@ The BatteryUpgrade software runs on both the Muxsan 3-port CAN-bridge, and on th
 |  Bridge version |  Purchase link |
 | :--------: | :---------: |
 | 3-port Muxsan | [Muxsan's Tindie store](https://www.tindie.com/products/muxsan/can-mitm-bridge-3-port-rev-25/)   |
-| 2-port budget | [AliExpress "MB CAN Filter 18 in 1](https://www.aliexpress.com/item/1005003112723581.html?)   |
+| 2-port budget | [AliExpress "MB CAN Filter 18 in 1](https://www.aliexpress.com/w/wholesale-MB-CAN-Filter-18-in-1.html?spm=a2g0o.home.search.0)   |
 
 Note, for 2-port it has to be the BLUE PCB, the other varients are not supported.
 
