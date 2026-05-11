@@ -273,6 +273,13 @@ void can_handler(uint8_t can_bus, CAN_FRAME *frame)
                 {                                                  // VCM command: wakeup
 										frame->data[3] = (frame->data[3] & 0xD7) | 0x28; // FRLYON=1, INTERLOCK=1
                 }			
+				if (startup_counter_1DB == 199) //wait a bit??
+  				{
+  					if (charging_state & (CHARGING_QUICK | CHARGING_SLOW)) //check only if relevant bits set
+  					{
+  						startup_counter_1DB = 1000; //skip instrumentation cluster fix when starting charge session, to prevent disrupting charge
+  					}
+  				}
 				if (startup_counter_1DB >= 100 && startup_counter_1DB <= 300) // Between 1s and 3s after poweron
 				{
 					frame->data[3] = (frame->data[3] | 0x10); // Set the full charge flag to ON during startup
