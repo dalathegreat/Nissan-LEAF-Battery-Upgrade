@@ -62,8 +62,8 @@ volatile	uint16_t	battery_soc_pptt		= 0;
 
 volatile	uint8_t		swap_idx				= 0;
 volatile	uint8_t		swap_5c0_idx			= 0;
+volatile	uint8_t		startup_counter			= 0; //counts number of 10ms frames since startup
 volatile	uint8_t		VCM_WakeUpSleepCommand	= 0;
-volatile	uint8_t		Byte2_50B				= 0;
 volatile	uint8_t		ALU_question			= 0;
 volatile	uint8_t		cmr_idx					= QUICK_CHARGE;
 
@@ -76,7 +76,6 @@ volatile	uint8_t		seconds_without_1f2		= 0; //bugfix: 0x603/69C/etc. isn't sent 
 volatile	uint8_t		main_battery_temp		= 0; 
 volatile	uint8_t		battery_can_bus			= 2; //keeps track on which CAN bus the battery talks. 
 volatile	uint16_t	startup_counter_1DB		= 0;
-volatile 	uint8_t		startup_counter_39X 	= 0;
 //timer variables
 volatile	uint16_t	sec_timer			= 1;	//actually the same as ms_timer but counts down from 1000
 
@@ -105,10 +104,7 @@ static		can_frame_t		swap_605_message	= {.can_id = 0x605, .can_dlc = 1, .data = 
 static		can_frame_t		swap_607_message	= {.can_id = 0x607, .can_dlc = 1, .data = {0}};
 static		can_frame_t		AZE0_45E_message	= {.can_id = 0x45E, .can_dlc = 1, .data = {0x00}};
 static		can_frame_t		AZE0_481_message	= {.can_id = 0x481, .can_dlc = 2, .data = {0x40,0x00}};
-volatile	uint8_t			PRUN_39X			= 0;
 
-static		can_frame_t		AZE0_390_message	= {.can_id = 0x390, .can_dlc = 8, .data = {0x04,0x00,0x00,0x00,0x00,0x80,0x3c,0x07}}; // Sending removes P3196
-static		can_frame_t		AZE0_393_message	= {.can_id = 0x393, .can_dlc = 8, .data = {0x00,0x10,0x00,0x00,0x20,0x00,0x00,0x02}}; // Sending removes P3196
 
 void hw_init(void){
 	uint8_t caninit;
@@ -204,9 +200,8 @@ void hw_init(void){
 }
 
 void reset_state(){
+	startup_counter = 0; //car starting, reset startup counter for 1dc
 	charging_state = 0; //Reset charging state 
-	startup_counter_1DB = 0;
-	startup_counter_39X = 0;
 }
 
 int main(void){
@@ -416,10 +411,40 @@ void can_handler(uint8_t can_bus){
 					My_Leaf = MY_LEAF_2011;
 				}
 			break;
+			case 0x1DC:
+
+				if (startup_counter == 0)
+				{
+					frame.data[0] = 0xFF;
+					frame.data[1] = 0xFF;
+					frame.data[2] = 0xFF;
+					frame.data[3] = 0xFF;
+					frame.data[4] = 0x1F;
+					frame.data[5] = 0xFF;
+					frame.data[6] = 0xFC;
+				}
+				else if (startup_counter < 7)
+				{
+					frame.data[0] = 0xFF;
+					frame.data[1] = 0xFF;
+					frame.data[2] = 0xFF;
+					frame.data[3] = 0xFF;
+				}
+				else
+				{
+					//we are started up! let messages thru as they are
+				}
+
+				if (startup_counter < 255)
+				{
+					startup_counter++;
+				}
+			
+				calc_crc8(&frame);
+			break;
 			case 0x50B:
 
 				VCM_WakeUpSleepCommand = (frame.data[3] & 0xC0) >> 6;
-				Byte2_50B = frame.data[2];
 			
 				if( My_Leaf == MY_LEAF_2011 )
 				{
@@ -437,45 +462,10 @@ void can_handler(uint8_t can_bus){
 				send_can(battery_can_bus, ZE1_5C5_message); // 100ms
 				send_can(battery_can_bus, ZE1_3B8_message); // 100ms
 
-				if( My_Leaf == MY_LEAF_2011 ) // ZE0 OBC messages wont satisfy the battery. Send 2013+ PDM messages towards it!
-				{
-
-					if(startup_counter_39X < 250){
-						startup_counter_39X++;
-					}
-					AZE0_390_message.data[0] = 0x04;
-					AZE0_390_message.data[3] = 0x00;
-					AZE0_390_message.data[5] = 0x80;
-					AZE0_390_message.data[6] = 0x3C;
-					AZE0_393_message.data[1] = 0x10;
-
-					if(startup_counter_39X > 13){
-						AZE0_390_message.data[3] = 0x02;
-						AZE0_390_message.data[6] = 0x00;
-						AZE0_393_message.data[1] = 0x20;
-					}
-					if(startup_counter_39X > 15){
-						AZE0_390_message.data[3] = 0x03;
-						AZE0_390_message.data[6] = 0x00;
-					}
-					if((startup_counter_39X > 20) && (Byte2_50B == 0)){ //Shutdown
-						AZE0_390_message.data[0] = 0x08;
-						AZE0_390_message.data[3] = 0x01;
-						AZE0_390_message.data[5] = 0x90;
-						AZE0_390_message.data[6] = 0x00;
-						AZE0_393_message.data[1] = 0x70;
-					}
-
-					PRUN_39X = (PRUN_39X + 1) % 3;
-					AZE0_390_message.data[7] = (PRUN_39X << 4);
-					AZE0_393_message.data[7] = (PRUN_39X << 4);
-					calc_checksum4(&AZE0_390_message);
-					calc_checksum4(&AZE0_393_message);
-					send_can(battery_can_bus, AZE0_390_message); // 100ms
-					send_can(battery_can_bus, AZE0_393_message); // 100ms
-				}
-
 				content_3B8 = (content_3B8 + 1) % 15;
+				//This takes advantage of the modulus operator % to reset the value of content_3B8 to 0 once it reaches 15.
+				//It also eliminates the need for an if statement and a conditional check, which improves performance (but sacrifices readability)
+
 				ZE1_3B8_message.data[2] = content_3B8; // 0 - 14 (0x00 - 0x0E)
 
 				if (flip_3B8)
@@ -779,7 +769,7 @@ void can_handler(uint8_t can_bus){
 					{
 						// Only for 40/62kWh packs retrofitted to ZE0
 						frame.data[3] = 0xA0;                    // Change from gen1->gen4+ . But doesn't seem to help much. We fix it anyways.
-						calc_sum2(&frame);
+						calc_sum4(&frame);
 					}
 	 
 				}
@@ -804,7 +794,7 @@ void can_handler(uint8_t can_bus){
 				case 0x68C:
 				case 0x603:
 				reset_state(); // Reset all states, vehicle is starting up
-
+				startup_counter_1DB = 0;
 				send_can(battery_can_bus, swap_605_message); // Send these ZE1 messages towards battery
 				send_can(battery_can_bus, swap_607_message);
 				break;
